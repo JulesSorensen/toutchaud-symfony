@@ -7,21 +7,21 @@
 	<div class="container mt-4">
 		<h1>Mes ingrédients</h1>
 
-		<a href="{{path('ingredient.new')}}" class="btn btn-primary">Créer un ingrédient</a>
-
 		{% for message in app.flashes('success') %}
-			<div class="alert alert-dismissible alert-success">
+			<div class="alert alert-dismissible alert-success mb-3">
 				{{ message }}
 			</div>
 		{% endfor %}
 
+		<a href="{{path('ingredient.new')}}" class="btn btn-primary">Créer un ingrédient</a>
+
 		{% if not ingredients is same as([]) %}
 			<div class="mt-4">
-				<h5>
+				<h6>
 					Il y a
 					{{ ingredients.getTotalItemCount() }}
 					ingrédients au total
-				</h5>
+				</h6>
 			</div>
 
 			<table class="table table-hover">
@@ -31,6 +31,8 @@
 						<th scope="col">Nom</th>
 						<th scope="col">Prix</th>
 						<th scope="col">Date de création</th>
+						<th scope="col">Edition</th>
+						<th scope="col">Suppression</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -40,6 +42,12 @@
 							<td>{{ ingredient.name }}</td>
 							<td>{{ ingredient.price }}</td>
 							<td>{{ ingredient.createdAt|date('d/m/Y - h:m:s') }}</td>
+							<td>
+								<a href="{{ path('ingredient.update', { id: ingredient.id }) }}" class="btn btn-info">Editer</a>
+							</td>
+							<td>
+								<a href="{{ path('ingredient.delete', { id: ingredient.id }) }}" class="btn btn-warning">Supprimer</a>
+							</td>
 						</tr>
 					{% endfor %}
 				</tbody>

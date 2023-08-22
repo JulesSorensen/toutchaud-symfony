@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Ingredient;
 use App\Form\IngredientType;
+use App\Form\IngredientUpdateType;
 use App\Repository\IngredientRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
@@ -15,7 +16,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class IngredientController extends AbstractController
 {
     /**
-     * This function displays the list of ingredients
+     * This controller displays the list of ingredients
      *
      * @param IngredientRepository $repository
      * @param PaginatorInterface $paginator
@@ -36,6 +37,13 @@ class IngredientController extends AbstractController
         ]);
     }
 
+    /**
+     * This controller show a form wich create a new ingredient
+     *
+     * @param Request $request
+     * @param EntityManagerInterface $manager
+     * @return Response
+     */
     #[Route('/ingredient/nouveau', name: 'ingredient.new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $manager): Response
     {
@@ -57,5 +65,38 @@ class IngredientController extends AbstractController
         return $this->render('pages/ingredient/new.html.twig', [
             'form' => $form->createView()
         ]);
+    }
+
+    #[Route('/ingredient/edition/{id}', name: 'ingredient.update', methods: ['GET', 'POST'])]
+    public function edit(Ingredient $ingredient, Request $request, EntityManagerInterface $manager): Response
+    {
+        $form = $this->createForm(IngredientUpdateType::class, $ingredient);
+
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $ingredient = $form->getData();
+
+            $manager->persist($ingredient);
+            $manager->flush();
+
+            $this->addFlash('success', 'Votre ingrédient a bien été mis à jour !');
+
+            return $this->redirectToRoute('ingredient.index');
+        }
+
+        return $this->render('pages/ingredient/update.html.twig', [
+            'form' => $form->createView()
+        ]);
+    }
+
+    #[Route('/ingredient/suppression/{id}', name: 'ingredient.delete', methods: ['GET', 'POST'])]
+    public function delete(Ingredient $ingredient, EntityManagerInterface $manager): Response
+    {
+        $manager->remove($ingredient);
+        $manager->flush();
+
+        $this->addFlash('success', 'Votre ingrédient a bien été supprimé !');
+
+        return $this->redirectToRoute('ingredient.index');
     }
 }
